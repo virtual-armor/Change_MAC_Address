@@ -28,10 +28,10 @@ def change_mac(interface, mac_address):
 	sp.call(["sudo", "ifconfig", interface, "hw", "ether", mac_address])
 	sp.call(["sudo", "ifconfig", interface, "up"])
 
-def display_mac(interface):
+def get_mac(interface):
 	output_result = sp.check_output(["ifconfig", interface])
-
-	reg_search_result = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", output_result)
+	#Change output_result from bytes-like object to string to avoid python3 error
+	reg_search_result = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", str(output_result))
 	if reg_search_result:
 		return reg_search_result.group(0)
 	else:
@@ -39,10 +39,10 @@ def display_mac(interface):
 
 #call functions
 options = get_args()
-updated_mac = display_mac(options.interface)
-print("Change MAC to: " + str(updated_mac))
+current_mac = get_mac(options.interface)
+print("Current MAC: " + str(current_mac))
 change_mac(options.interface, options.mac_address)
-updated_mac = display_mac(options.interface)
+updated_mac = get_mac(options.interface)
 
 if updated_mac == options.mac_address:
 	print("[+] The MAC address was successfully changed to: " + updated_mac)
